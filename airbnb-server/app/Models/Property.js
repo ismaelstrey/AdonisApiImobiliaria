@@ -1,10 +1,15 @@
 'use strict'
-
-/** @type {typeof import('@adonisjs/lucid/src/Lucid/Model')} */
 const Model = use('Model')
 const Database = use('Database')
 
 class Property extends Model {
+  user() {
+    return this.belongsTo('App/Models/User')
+  }
+
+  images() {
+    return this.hasMany('App/Models/Image')
+  }
   static scopeNearBy(query, latitude, longitude, distance) {
 
     const haversine = `(6371 * acos(cos(radians(${latitude}))
@@ -17,7 +22,7 @@ class Property extends Model {
     return query
       .select('*', Database.raw(`${haversine} as distance`))
       .whereRaw(`${haversine} < ${distance}`)
-    return query;
+
   }
 }
 

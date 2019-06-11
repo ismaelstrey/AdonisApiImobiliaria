@@ -1,23 +1,7 @@
 'use strict'
 const Property = use('App/Models/Property')
-
-/** @typedef {import('@adonisjs/framework/src/Request')} Request */
-/** @typedef {import('@adonisjs/framework/src/Response')} Response */
-/** @typedef {import('@adonisjs/framework/src/View')} View */
-
-/**
- * Resourceful controller for interacting with properties
- */
 class PropertyController {
-  /**
-   * Show a list of all properties.
-   * GET properties
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
+
   async index({
     request
   }) {
@@ -33,39 +17,20 @@ class PropertyController {
     return properties
   }
 
-  /**
-   * Render a form to be used for creating a new property.
-   * GET properties/create
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
+  async store ({ auth, request, response }) {
+    const { id } = auth.user
+    const data = request.only([
+      'title',
+      'address',
+      'latitude',
+      'longitude',
+      'price'
+    ])
 
+    const property = await Property.create({ ...data, user_id: id })
 
-  /**
-   * Create/save a new property.
-   * POST properties
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async store({
-    request,
-    response
-  }) {}
-
-  /**
-   * Display a single property.
-   * GET properties/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
+    return property
+  }
   async show({
     params
   }) {
@@ -76,39 +41,25 @@ class PropertyController {
     return property
   }
 
-  /**
-   * Render a form to update an existing property.
-   * GET properties/:id/edit
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
+  async update ({ params, request, response }) {
+    const property = await Property.findOrFail(params.id)
 
-  /**
-   * Update property details.
-   * PUT or PATCH properties/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async update({
-    params,
-    request,
-    response
-  }) {}
+    const data = request.only([
+      'title',
+      'address',
+      'latitude',
+      'longitude',
+      'price'
+    ])
 
-  /**
-   * Delete a property with id.
-   * DELETE properties/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async destroy({
+    property.merge(data)
+
+    await property.save()
+
+    return property
+  }
+
+   async destroy({
     params,
     auth,
     response

@@ -14,7 +14,7 @@
 const Factory = use('Factory')
 
 class DatabaseSeeder {
-  async run () {
+  async run() {
   }
 }
 
